@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- init eruda js -->
+        <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+        <script>eruda.init();</script>
+        <style>
+            canvas {
+                image-rendering: pixelated;
+            }
+            /* center everything */
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                flex-direction: column;
+            }
+        </style>
+    </head>
+    <!-- DIVIDER HEAD AND BODY -->
+    <body style="background-color:#000000">
+    <canvas id="myCanvas" width="500" height="500" style="border:1px solid #332c2c;background-color:#171717"></canvas>
+    <button onclick="initialState()">START</button>
+    <button onclick="stepGOL(dynamicMatrix);">STEP</button>
+
+    <div class="sidebyside" style="display: flex; gap: 10px;">
+        <button onclick="play()">PLAY</button>
+        <button onclick="pause()">PAUSE</button>
+    </div>
+
+    <button onclick="CLEAR()">CLEAR</button>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawCircle(ctx, x, y, radius, fillColor, strokeColor, strokeWidth) {
+            ctx.beginPath(); // Start a new path
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, false); // Create a full circle arc
+
+            if (fillColor) {
+                ctx.fillStyle = fillColor; // Set fill color if provided
+                ctx.fill(); // Fill the circle
+            }
+
+            if (strokeColor && strokeWidth) {
+                ctx.strokeStyle = strokeColor; // Set stroke color if provided
+                ctx.lineWidth = strokeWidth; // Set line width if provided
+                ctx.stroke(); // Draw the circle's outline
+            }
+        }
+
+
+
+        let framesBeforeLoop = 100;
+        let frameCount = 100;
+        let currentFrame = 0;
+
+        function vid(){
+            setInterval(() => {
+                if (currentFrame >= framesBeforeLoop) {
+                    currentFrame = 0; // Reset frame count
+                }
+                currentFrame++;
+                // Clear the canvas for the new frame
+                // CLEAR();
+
+                const img = new Image();
+                img.src = 'beebo.jpg';
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    let data = imageData.data;
+                    // Example: invert colors
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = data[i];     // Red
+                        data[i+1] = data[i+1]; // Green
+                        data[i+2] = data[i+2]; // Blue
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                };
+            }, 400);
+        }
+
+        // canvas.addEventListener('mousemove', handleMouseMove);
+        // function handleMouseMove() {
+        //     stepGOL(dynamicMatrix);
+        // }
+
+        // step gol every second
+        setInterval(() => {
+            if ((dynamicMatrix.length > 0) && playing){
+                stepGOL(dynamicMatrix);
+
+            }
+        }, 100);
+
+
+
+
+
+
+
+
+        function bcos(x){
+            // Make the wave visible: scale x and amplitude
+            return 127.5 * Math.sin(.2*x)+127.5;
+        }
+        function getRgb(r,g,b){
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        function randomNum(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function randomColor(r,g,b) {
+            if (r && g && b) {
+                return 'rgb(' + Math.floor(Math.random() * r) + ',' + Math.floor(Math.random() * g) + ',' + Math.floor(Math.random() * b) + ')';
+            }
+            return 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')';
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function CLEAR(){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function play(){ playing = true;}
+        function pause(){ playing = false;}
+
+        let playing = false;
+        const rows = canvas.height;
+        const cols = canvas.width;
+        let dynamicMatrix = [];
+
+        function initialState() {
+            for (let i = 0; i < rows; i++) {
+                dynamicMatrix[i] = []; // Initialize each row as an empty array
+                for (let j = 0; j < cols; j++) {
+                    let state = randomNum(0,1);
+                    dynamicMatrix[i][j] = state;
+                    if (state) {
+                        ctx.fillStyle = getRgb(bcos(i),bcos(j),255);
+                        ctx.fillRect(i, j, 1, 1);
+                    }
+                }
+            }
+            console.log("set to initial state");
+            play();
+        }
+        function DRAW(){
+            stepGOL(dynamicMatrix)
+        }
+        function stepGOL(prev){
+            CLEAR();
+            let next = [];
+            for (let i = 0; i < rows; i++) {
+                next[i] = []; // Initialize each row as an empty array
+                for (let j = 0; j < cols; j++) {
+                    
+                    if (i === 0 || i === rows - 1 || j === 0 || j === cols - 1) {
+                        // KILL CELLS ON THE EDGE
+                        next[i][j] = 0;
+                    } else {
+                        let around = collectNeighbors(prev,i,j);
+                        if (prev[i][j]){
+                            
+                            // IF CELL ALIVE
+                            if(around < 2){ //death by underpopulation
+                                next[i][j] = 0;
+                            }
+                            if(around == 2 || around == 3){ //lives, 2 or 3 neighbors
+                                next[i][j] = 1;
+                                ctx.fillStyle = "white";
+                                ctx.fillRect(i, j, 1, 1);
+                            }
+                            if(around > 3){ //death by overpopulation
+                                next[i][j] = 0;
+                            }
+                        }
+                        else { // if cell is dead
+                            if (around == 3){ // reproduce if dead and 3 neighbors
+                                next[i][j] = 1;
+                                ctx.fillStyle = "white";
+                                ctx.fillRect(i, j, 1, 1);
+                            }
+                        }
+                    }
+
+                    // if ( (prev[i][j] == next[i][j]) && prev[i][j] == 1){
+                    //     ctx.fillStyle = "red";
+                    //     ctx.fillRect(i, j, 1, 1);
+                    // }
+                    // if cell did not move show red
+                }
+            }
+            dynamicMatrix = next;
+        }
+        function collectNeighbors(array,x,y) {
+            let total=0;
+            if(array[x-1][y]){
+                total++;
+            }
+            if(array[x+1][y]){
+                total++;
+            }
+            if(array[x-1][y-1]){
+                total++;
+            }
+            if(array[x-1][y+1]){
+                total++;
+            }
+            if(array[x][y+1]){
+                total++;
+            }
+            if(array[x][y-1]){
+                total++;
+            }
+            if(array[x+1][y+1]){
+                total++;
+            }
+            if(array[x+1][y-1]){
+                total++;
+            }
+            return total ; 
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!-- if (i === 0 || i === rows - 1 || j === 0 || j === cols - 1) {
+                        // KILL CELLS ON THE EDGE
+                        next[i][j] = 0;
+                    } else {
+                        let around = collectNeighbors(prev,i,j);
+                        if (prev[i][j]){
+                            
+                            // IF CELL ALIVE
+                            if(around < 3){ //death by underpopulation
+                                next[i][j] = 0;
+                            }
+                            if(around == 4 || around == 3){ //lives, 2 or 3 neighbors
+                                next[i][j] = 1;
+                                ctx.fillStyle = "white";
+                                ctx.fillRect(i, j, 1, 1);
+                            }
+                            if(around > 4){ //death by overpopulation
+                                next[i][j] = 0;
+                            }
+                        }
+                        else { // if cell is dead
+                            if (around == 3){ // reproduce if dead and 3 neighbors
+                                next[i][j] = 1;
+                                ctx.fillStyle = "white";
+                                ctx.fillRect(i, j, 1, 1);
+                            }
+                        }
+                    } -->
