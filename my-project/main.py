@@ -48,4 +48,21 @@ class MoonScene(Scene):
         
 
         self.play(FadeIn(moon))
-        self.play(Scene.add(cut))
+        self.play(FadeIn(cut))
+        
+from manim import *
+
+class StarExample(Scene):
+    def construct(self):
+        pentagram = RegularPolygram(5, radius=2)
+        star = Star(outer_radius=2, color=RED)
+        circle = Circle() 
+        star2 = Star(outer_radius=2)
+        shapes = VGroup(star)
+        shapes.add(star2.round_corners(radius=0.25))
+
+        self.add(pentagram)
+        self.play(Create(star), run_time=3)
+        self.play(FadeOut(star), run_time=2)
+        self.play(Transform(pentagram,circle))
+        self.play(Transform(circle,shapes))

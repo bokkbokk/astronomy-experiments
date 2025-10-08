@@ -1,4 +1,4 @@
 # This file is used internally by FFMPEG.
-file 'file:E:/tuckerstuff/Dev/REPOS/astronomy/astronomy-experiments/my-project/media/videos/main/854p30/partial_movie_files/SquareToCircle/4140469606_2631387112_223132457.mp4'
-file 'file:E:/tuckerstuff/Dev/REPOS/astronomy/astronomy-experiments/my-project/media/videos/main/854p30/partial_movie_files/SquareToCircle/355205087_638377151_557880437.mp4'
-file 'file:E:/tuckerstuff/Dev/REPOS/astronomy/astronomy-experiments/my-project/media/videos/main/854p30/partial_movie_files/SquareToCircle/355205087_4132448990_557880437.mp4'
+file 'file:/workspaces/astronomy-experiments/my-project/media/videos/main/854p30/partial_movie_files/SquareToCircle/4140469606_2631387112_223132457.mp4'
+file 'file:/workspaces/astronomy-experiments/my-project/media/videos/main/854p30/partial_movie_files/SquareToCircle/355205087_638377151_557880437.mp4'
+file 'file:/workspaces/astronomy-experiments/my-project/media/videos/main/854p30/partial_movie_files/SquareToCircle/355205087_4132448990_557880437.mp4'
